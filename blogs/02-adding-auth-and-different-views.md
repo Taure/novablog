@@ -1,13 +1,16 @@
+## Adding authd and a new view
+
 In the previous section, we created a Nova application.
 
-Now we will add a small login form and try to auth and if we pass it will show a view with the message "Welcome Daniel!".
+Now we will add a small login form. We'll atempt to authenticate, and if succesful, it will display a view with the message "Welcome Daniel!".
 
-The structure we have in applications using Nova is that in src/ we usually have modules that are used by our application. In the directory src/controllers, we will have Erlang modules that will be used to handle requests.
-In the directory src/views, we have the .dtl files for our endpoints. The names need to match so MY_VIEW.dtl should match MY_VIEW_controller.erl.
+In applications using Nova, our typical structure involves having modules in the `src/` directory that are utilized by our application. Within the `src/controllers` directory, we'll have Erlang modules dedicated to handling requests.
 
-Security is handled in our routing file. It looks like this.
+In the directory `src/views`, we have the `.dtl` files for our endpoints. It's important to ensure consistency in naming; therefore, `MY_VIEW.dtl` should correspond with `MY_VIEW_controller.erl`.
 
-```
+Security is managed within our routing file, which is structured as follows.
+
+```erlang
 -module(my_first_nova_router).
 -behaviour(nova_router).
 
@@ -26,9 +29,9 @@ routes(_Environment) ->
       }].
 
 ```
-Nova can have different routes depending on what you want to achieve. So for now we want to add a setting for endpoints that will use a security module.
+Nova offers flexibility with its routing options, allowing customization based on specific objectives. Currently, our focus is on configuring endpoints to utilize a security module.
 
-```
+```erlang
 -module(my_first_nova_router).
 -behaviour(nova_router).
 
@@ -54,11 +57,11 @@ routes(_Environment) ->
     }].
 ```
 
-When we add the input form it will submit a username and password on the endpoint `/login`. If it passes our auth module `my_first_nova_auth` it will show `my_first_nova_login.dtl` and also `my_first_nova_login_controller` will have the logic. One other thing is that we use a plugin here called `nova_request_plugin` it takes a map as a configuration and we say that we want it to read the urlencoded body. We will get a key called `params` in the Req that will contain a erlang map.
+Upon incorporating the input form, users will submit a username and password to the `/login` endpoint. Upon successful authentication by our `my_first_nova_auth` module, the system will display `my_first_nova_login.dtl`, and the logic will be handled by `my_first_nova_login_controller`. One other thing is that we use a plugin here called `nova_request_plugin` it takes a map as a configuration. Additionally, we utilize a plugin called `nova_request_plugin`, which is configured to read the urlencoded body. We will receive a key called `params` in the Req, which will contain an Erlang map.
 
 First, we change the view for our main page my_first_nova_main.dtl.
 
-```
+```html
 <html>
 <body>
   <div>
@@ -73,11 +76,11 @@ First, we change the view for our main page my_first_nova_main.dtl.
 </body>
 </html>
 ```
-We have added an input form now that has a username and password. When we click on the submit button it will trigger the auth module.
+We have added an input form now that has a username and password. Clicking the submit button triggers the authentication module.
 
-my_first_nova_auth.erl, we specified in our routing file what the module should be called and the function that will be used.
+`my_first_nova_auth.erl`, we specified in our routing file what the module should be called and the function that will be used.
 
-```
+```erlang
 -module(my_first_nova_auth).
 
 -export([auth/1]).
@@ -93,15 +96,13 @@ auth(#{params := Params}) ->
     end.
 ```
 
-Input will send data as a string so that is what the plugin will parse for us.
+Once data is submitted, the authentication module processes it as a erlang map, which is patterned matched by the plugin.
 
-Data here will be a binary string `<<"username=USERNAME&password=PASSWORD">>`.
-
-When we return a tuple with {true, map()}, the map will be added to the Req-map as a field called `auth_data`. If we had a rest API or want to send back a 401 to the one that did the request we return false in our auth module. But in this case, we want to redirect back to `/` if you pass in the wrong credentials. If we did enter the correct password and username we are going to show `Welcome USERNAME!`.
+When we return a tuple with `{true, map()}`, the map will be added to the Req-map as a field called `auth_data`. If we had a rest API or want to send back a 401 to the one that did the request we return false in our auth module. If authentication fails, the system redirects back to `/`. However, if authentication succeeds, the system displays the `Welcome USERNAME!` message.
 
 We need to create the controller now and the view for this, `my_first_nova_login_controller.erl` in `src/controllers/`.
 
-```
+```erlang
 -module(my_first_nova_login_controller).
 
 -export([index/1]).
@@ -116,7 +117,7 @@ index(#{auth_data := #{<<"authed">> := false}}) ->
 In the controller, we have an index function that takes one argument, which is a cowboy request.
 
 And then the view `my_first_nova_login.dtl` should be created in `src/views/`
-```
+```html
 <html>
 <body>
 <h1> Welcome {{ username }}!</h1>
@@ -126,9 +127,9 @@ And then the view `my_first_nova_login.dtl` should be created in `src/views/`
 
 What will happen here is that if we have the correct username and password the auth module will pass on the map we are giving in it. If authentication are false it will redirect back to `/` if it returns true we should print the Username.
 
-In this case, we didn't use any database or so to have users, just to show how things work. If you want to see this with what you enter in the username we can change the auth module to.
+In this case, we didn't use any database or so to have users, solely to demonstrate functionality.. If you want to see this with what you enter in the username we can change the auth module to.
 
-```
+```erlang
 -module(my_first_nova_auth).
 
 -export([auth/1]).

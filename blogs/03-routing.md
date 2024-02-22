@@ -1,10 +1,12 @@
+## Routing
+
 Here I will write about routing in Nova and how it works.
 
-When we generate a new Nova app we will have a routing file in our src directory.
+When we generate a new Nova app we will have a routing file within our src directory.
 
 The file is named `MYAPP_router.erl` in that file we have a function that has a list of Erlang maps that will specify and configure what rules are for an endpoint.
 
-```
+```erlang
 -module(my_first_nova_router).
 -behaviour(nova_router).
 
@@ -30,10 +32,10 @@ routes(_Environment) ->
     }].
 ```
 
-What does this routing configuration say to us?
+What does this routing configuration indicate?
 The prefix is what we will match against first, in this way, you can create different routing configures depending on the prefix.
 
-```
+```erlang
 -module(my_first_nova_router).
 -behaviour(nova_router).
 
@@ -66,4 +68,4 @@ routes(_Environment) ->
 }.
 
 ```
-The last map here is using prefix, so all paths in routes will be `/user/:userid` and then the endpoint in the routes.
+The last map here is using prefix, thus, all paths in routes will be `/user/:userid`.

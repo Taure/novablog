@@ -73,54 +73,32 @@ We want to say in what order we want plugins to be run. We do this in sys.config
 
 ```erlang
 {nova, [
+         {use_stacktrace, true},
+         {environment, dev},
          {cowboy_configuration, #{
-                                  port => 8190
+                                  port => 8080
                                  }},
          {dev_mode, true},
-         {bootstrap_application, MYAPP}, %% Bootstraps the application
+         {bootstrap_application, my_first_nova}, %% Bootstraps the application
          %% Plugins is written on form {RequestType, Module, Options, Priority}
          %% Priority is that the lowest number is executed first
          {plugins, [
-                    {pre_request, nova_cors_plugin, #{}},
-                    {pre_request, nova_request_plugin, #{decode_json_body => true,
-                                          parse_qs => true}}
+                    {pre_request, nova_request_plugin, #{decode_json_body => true}}
                    ]}
-        ]},
+        ]}
+  %% Please change your app.src-file instead if you intend to add app-specific configurations
 ```
 In this scenario:
-`nova_cors_plugin` is first,
-`nova_request_plugin` will be called after `nova_cors_plugin`
-In the nova_request_plugin, we have set some values:
+`nova_request_plugin` is a plugin that is included with Nova, it can handle some decoding of incomming bodies.
+
+To read more about what plugins are included in Nova you can read it [here](https://hexdocs.pm/nova/plugins.html).
+
+What we want to do in our application is that we are later going to create a view that will send in an urlencoded body from a form submit. An easy login page.
+
+If we want Nova to decode this urlencoded body we will need to change our plugin setting to:
 
 ```erlang
-{pre_request, nova_request_plugin, #{decode_json_body => true,
-                                          parse_qs => true}}
+    {plugins, [
+            {pre_request, nova_request_plugin, #{read_urlencoded_body => true}}
+            ]}
 ```
-
-What will the request plugin do?
-
-We have decode_json_body this will if we get a body in the request and it it content-type: application/json decode the body and move it to the Request object.
-
-```erlang
-#{json => JSONMap} (Keys in JSONMap will be binary)
-```
-
-The last part of the request plugin will add QS to Nova state if QS is used.
-
-```erlang
-#{
-  json => JSONMap,
-  parsed_qs => QS}
-```
-
-Because we have this in a plugin this will happen for all requests that are used for this Nova application. So, we don't need to handle JSON decode for all of our controllers.
-
-Plugins are a way to streamline processes that you would otherwise need to perform in all your requests for your endpoints. They can apply to either all endpoints or specific ones, depending on how you add the plugins to your routes.
-
-### Plugins vs Cowboy middlewares
-
-If you've used Cowboy, you know that you can write middlewares that perform certain actions for all your requests, depending on their order.
-
-Plugins are very similar, but now you can have one module that handles what happens both before and after the request reaches your controller.
-
-The difference is that you can say what endpoints are going to use what plugins and in that way do more specific things like decoding body or json validation for example.

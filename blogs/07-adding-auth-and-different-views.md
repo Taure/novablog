@@ -1,6 +1,6 @@
 ## Adding authd and a new view
 
-In the previous section, we created a Nova application.
+In earlier sections, we have talked about routings and plugins.
 
 Now we will add a small login form. We'll atempt to authenticate, and if succesful, it will display a view with the message "Welcome Daniel!".
 

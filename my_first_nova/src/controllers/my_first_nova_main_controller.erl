@@ -3,5 +3,5 @@
          index/1
         ]).
 
-index(_Req) ->
-    {ok, [{message, "Hello world!"}]}.
+index(#{}) ->
+    {ok, [], #{view => login}}.

@@ -12,7 +12,7 @@ We want to create a simple view that have to input fields that will send in user
 <html>
 <body>
   <div>
-    <form action="/auth" method="post" id="nameform">
+    <form action="/" method="post" id="nameform">
       <label for="username">userame:</label>
       <input type="text" id="username" name="username"><br>
       <label for="password">Password:</label>

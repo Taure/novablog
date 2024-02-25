@@ -1,5 +1,8 @@
 ## Plugins
 
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/v21alnncsiqd9p6rkjmq.png)
+
+
 Plugins in Nova are modules that have a behaviour, these behaviours will be a part of the pipeline flow of a request.
 
 ```erlang

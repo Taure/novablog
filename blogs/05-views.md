@@ -12,7 +12,7 @@ We want to create a simple view that have to input fields that will send in user
 <html>
 <body>
   <div>
-    <form action="/login" method="post" id="nameform">
+    <form action="/auth" method="post" id="nameform">
       <label for="username">userame:</label>
       <input type="text" id="username" name="username"><br>
       <label for="password">Password:</label>
@@ -51,14 +51,18 @@ The function we want to add is `login/1`.
 ```erlang
 -module(my_first_nova_main_controller).
 -export([
-         index/1
+         index/1,
+         login/1
         ]).
 
 index(_Req) ->
-    {ok, [{}], #{view => login}}.
+    {ok, [{message, "Hello world!"}]}.
+
+login(_Req) ->
+    {ok, [], #{view => login}}.
 ```
 
-What this return tuple will tell Nova is that we want a view and it is named `login`, Nova will check after the view and show it if we go to `localhost:8080`.
+What this return tuple will tell Nova is that we want a view and it is named `login`, Nova will check after the view and show it if we go to `localhost:8080/login`. And because we added the route before in the routing file we will now connect the view.
 
 
-
+![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/rk38xwr4zimgul2upeq8.png)

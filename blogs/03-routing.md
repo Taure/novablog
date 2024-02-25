@@ -105,10 +105,10 @@ routes(_Environment) ->
       security => false,
       routes => [
                  {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
-                 {"/login", { my_first_nova_main_controller, login}, #{methods => [post]}},
+                 {"/login", { my_first_nova_main_controller, login}, #{methods => [get]}},
                  {"/assets/[...]", "assets"}
                 ]
       }].
 ```
 
-In the example above we have added a new route for `login` that we want to use later.
+In the example above we have added a new route for `login`.

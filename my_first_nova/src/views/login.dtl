@@ -1,7 +1,7 @@
 <html>
 <body>
   <div>
-    <form action="/login" method="post" id="nameform">
+    <form action="/" method="post" id="nameform">
       <label for="username">userame:</label>
       <input type="text" id="username" name="username"><br>
       <label for="password">Password:</label>

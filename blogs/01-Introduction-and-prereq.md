@@ -28,7 +28,7 @@ When we bootstrap our application we will get a `.tool-versions` file that inclu
 
 How to install `asdf`, you can read [here](https://asdf-vm.com/guide/getting-started.html) for more details.
 
-```
+```shell
 git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
 
 ```
@@ -37,23 +37,23 @@ This will install the asdf system, and then you will need to add it to your shel
 
 **Bash & Git**
 Add the following to `~/.bashrc`:
-```
+```shell
 . "$HOME/.asdf/asdf.sh"
 ```
 Completions must be confgured by adding the following to your `.bashrc`:
-```
+```shell
 . "$HOME/.asdf/completions/asdf.bash"
 ```
 
 After that asdf is installed we need to add the Rebar plugin to asdf.
 
-```
+```shell
 asdf plugin-add rebar https://github.com/Stratus3D/asdf-rebar.git
 ```
 
 And also the Erlang plugin.
 
-```
+```shell
 asdf plugin add erlang https://github.com/asdf-vm/asdf-erlang.git
 ```
 

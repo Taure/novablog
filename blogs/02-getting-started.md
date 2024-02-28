@@ -38,14 +38,14 @@ This command will create a directory with the same name as your application, the
 ```
 
 `.tool-versions` is used by asdf to know what versions of different packages that we can use here.
-```
+```shell
 erlang 26.2.2
 rebar 3.22.1
 ```
 
 If we now use asdf it will install Erlang with version 26.2.2 and rebar3 version 3.22.1.
 
-```
+```shell
 asdf install
 ```
 
@@ -56,13 +56,13 @@ In `src/` is our source code, in this library you will have two other libraries.
 `rebar.config` is for telling rebar3 how to build our application and also if we want to add dependencies or how we do releases. I will dig into this deeper later.
 
 In the `config/` directory you have two configuration files for your application, `dev_sys.config.src` and `prod_sys.config.src`. When we develop we use two commands in rebar3, first one is:
-```
+```shell
 rebar3 shell
 ```
 
 This will compile your code and start an Erlang shell, this is what we call development mode, so it will help you with dependencies and load all code. With the rebar3_nova plugin we have created a new command that is called:
 
-```
+```shell
 rebar3 nova serve
 ```
 

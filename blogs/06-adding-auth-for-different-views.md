@@ -19,8 +19,8 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
-                 {"/login", { my_first_nova_main_controller, login}, #{methods => [get]}},
+                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}},
                  {"/assets/[...]", "assets"}
                 ]
       }].
@@ -33,8 +33,8 @@ We will start with adding a new Route map into the list, and move the endpoint `
 
 ```erlang
     #{prefix => "",
-      security => {my_first_nova_auth, username_password},
-      routes => [{"/", { my_first_nova_main_controller, index}, #{methods => [post]}}]
+      security => fun my_first_nova_auth:username_password/1,
+      routes => [{"/", fun my_first_nova_main_controller:index/1, #{methods => [post]}}]
      }
 ```
 Here we have added the security `{my_first_nova_auth, username_password}` so this will be called before the request hits the controller.
@@ -81,12 +81,12 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/login", { my_first_nova_main_controller, login}, #{methods => [get]}}
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}}
                 ]
       },
     #{prefix => "",
-      security => {my_first_nova_auth, username_password},
-      routes => [{"/", { my_first_nova_main_controller, index}, #{methods => [post]}}]
+      security => fun my_first_nova_auth:username_password/1,
+      routes => [{"/", fun my_first_nova_main_controller:index/1, #{methods => [post]}}]
      }
    ].
 

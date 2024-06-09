@@ -59,7 +59,7 @@ prod() ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
+                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
                  {"/assets/[...]", "assets"}
                 ]
       }].
@@ -68,7 +68,7 @@ dev() ->
   [#{prefix => "",
   security => false,
   routes => [
-             {"/dev-tools", { my_first_nova_dev_controller, index}, #{methods => [get]}}
+             {"/dev-tools", fun my_first_nova_dev_controller:index/1, #{methods => [get]}}
             ]
   }].
 ```
@@ -80,14 +80,14 @@ Back to the structure of the routing:
 #{prefix => "",
   security => false,
   routes => [
-              {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
+              {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
               {"/assets/[...]", "assets"}
             ]
   }
 ```
 `prefix` is if you want to group your routes, example if you are going to make a lot of routes for users `v1/user`, `v1/user/USERKEY`, `v1/user/USERKEY/...` then you can use a prefix with `prefix => "/v1/user"` and every route in routes field will have it as a prefix.
-`security` here is if we want to have any security for the routes specified in this map. `security` takes a Erlang tuple, `{Module, Function}`.
-`routes` this is a list that takes an Erlang tuple `{PATH, {Module, Function}, #{}}`. Path is the endpoint, the tuple with `Module`and `Function` will tell you what controller is used for this endpoint.
+`security` here is if we want to have any security for the routes specified in this map. `security` takes a Erlang function, `fun Module:Function/1`.
+`routes` this is a list that takes an Erlang tuple `{PATH, fun Module:Function/1, #{}}`. Path is the endpoint, the function with `Module`and `Function` will tell you what controller is used for this endpoint.
 
 What we want to do is to add a new route to our application:
 
@@ -104,8 +104,8 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
-                 {"/login", { my_first_nova_main_controller, login}, #{methods => [get]}},
+                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}},
                  {"/assets/[...]", "assets"}
                 ]
       }].

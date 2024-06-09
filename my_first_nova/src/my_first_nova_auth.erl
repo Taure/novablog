@@ -5,7 +5,6 @@
 username_password(#{params := Params}) ->
     case Params of
         #{<<"username">> := Username,
-          <<"password">> := <<"password">>} -> {true, #{authed => true,
-                                                         username => Username}};
+          <<"password">> := <<"password">>} -> {true, #{username => Username}};
         _ -> false
     end.

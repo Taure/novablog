@@ -19,9 +19,9 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
-                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}},
-                 {"/assets/[...]", "assets"}
+                 {"/", fun my_first_nova_main_controller:index/1 , #{methods => [get]}},
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}},
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}}
                 ]
       }].
 
@@ -81,7 +81,8 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}}
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}},
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}}
                 ]
       },
     #{prefix => "",

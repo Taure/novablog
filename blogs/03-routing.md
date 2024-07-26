@@ -19,8 +19,8 @@ routes(_Environment) ->
     [#{prefix => "",
       security => false,
       routes => [
-                 {"/", { my_first_nova_main_controller, index}, #{methods => [get]}},
-                 {"/assets/[...]", "assets"}
+                 {"/", fun my_first_nova_main_controller:index/1 , #{methods => [get]}},
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}}
                 ]
       }].
 
@@ -59,8 +59,8 @@ prod() ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
-                 {"/assets/[...]", "assets"}
+                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},       
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}}
                 ]
       }].
 
@@ -80,8 +80,8 @@ Back to the structure of the routing:
 #{prefix => "",
   security => false,
   routes => [
-              {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
-              {"/assets/[...]", "assets"}
+             {"/", fun my_first_nova_main_controller:index/1 , #{methods => [get]}},
+             {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}}
             ]
   }
 ```
@@ -104,9 +104,9 @@ routes(_Environment) ->
   [#{prefix => "",
       security => false,
       routes => [
-                 {"/", fun my_first_nova_main_controller:index/1, #{methods => [get]}},
-                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}},
-                 {"/assets/[...]", "assets"}
+                 {"/", fun my_first_nova_main_controller:index/1 , #{methods => [get]}},
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}},
+                 {"/login", fun my_first_nova_main_controller:login/1, #{methods => [get]}}
                 ]
       }].
 ```

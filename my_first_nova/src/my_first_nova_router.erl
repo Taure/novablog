@@ -7,15 +7,10 @@
 
 %% The Environment-variable is defined in your sys.config in {nova, [{environment, Value}]}
 routes(_Environment) ->
-  [#{prefix => "",
+    [#{prefix => "",
       security => false,
       routes => [
-                 {"/login", { my_first_nova_main_controller, login}, #{methods => [get]}}
+                 {"/", fun my_first_nova_main_controller:index/1 , #{methods => [get]}},
+                 {"/heartbeat", fun(_) -> {status, 200} end, #{methods => [get]}}
                 ]
-      },
-    #{prefix => "",
-      security => {my_first_nova_auth, username_password},
-      routes => [{"/", { my_first_nova_main_controller, index}, #{methods => [post]}}]
-     }
-   ].
-
+      }].

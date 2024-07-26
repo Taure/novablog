@@ -75,7 +75,28 @@ Both of these commands when started will use the `dev_sys.config.src` configurat
 ```shell
 $ rebar3 nova serve
 ```
-When the node is up you can start a browser and go to `localhost:8080` this will show a homepage telling you that the system is up.
+When the node is up you can start a browser and go to `localhost:8080` this will show a homepage telling you that the system is up. The other way to see if your system is up is to `curl`heartbeat endpoint.
+
+```shell
+curl -v localhost:8080/heartbeat
+*   Trying 127.0.0.1:8080...
+* TCP_NODELAY set
+* Connected to localhost (127.0.0.1) port 8080 (#0)
+> GET /heartbeat HTTP/1.1
+> Host: localhost:8080
+> User-Agent: curl/7.68.0
+> Accept: */*
+> 
+* Mark bundle as not supporting multiuse
+< HTTP/1.1 200 OK
+< content-length: 0
+< date: Fri, 26 Jul 2024 08:39:45 GMT
+< server: Cowboy/Nova
+< vary: accept-encoding
+< set-cookie: session_id=60dl0UW8dnaUPU7DZ24GfF99+yTO2KAPzrWwUo0B0Zg=
+< 
+* Connection #0 to host localhost left intact
+```
 
 
 

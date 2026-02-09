@@ -1,20 +1,24 @@
 ## Database Integration
 
-Nova is a web framework and does not include a built-in ORM or database layer. This is by design, you are free to use whatever database and driver fits your project. In this article we will look at how to integrate PostgreSQL using `epgsql` and structure our data access code.
+Nova is a web framework and does not include a built-in ORM or database layer. This is by design, you are free to use whatever database and driver fits your project. In this article we will look at how to integrate PostgreSQL using `pgo` and structure our data access code.
+
+### Why pgo?
+
+[pgo](https://github.com/erleans/pgo) is a PostgreSQL client for Erlang with built-in connection pooling. Unlike some other drivers, you don't need to manage connections yourself or add a separate pool library like `poolboy`. You configure a pool in your sys.config and just call `pgo:query/2` — pgo handles checkout, checkin and reconnection for you.
 
 ### Adding the dependency
 
-We will use `epgsql` as our PostgreSQL driver. Add it to `rebar.config`:
+Add `pgo` to `rebar.config`:
 
 ```erlang
 {deps, [
         nova,
         {flatlog, "0.1.2"},
-        {epgsql, "4.7.1"}
+        pgo
        ]}.
 ```
 
-Also add `epgsql` to your application dependencies in `src/my_first_nova.app.src`:
+Also add `pgo` to your application dependencies in `src/my_first_nova.app.src`:
 
 ```erlang
 {application, my_first_nova,
@@ -26,7 +30,7 @@ Also add `epgsql` to your application dependencies in `src/my_first_nova.app.src
    [kernel,
     stdlib,
     nova,
-    epgsql
+    pgo
    ]},
   {licenses, ["Apache-2.0"]},
   {links, []}
@@ -35,97 +39,30 @@ Also add `epgsql` to your application dependencies in `src/my_first_nova.app.src
 
 ### Database configuration
 
-Add your database configuration to `dev_sys.config.src`:
+pgo pools are configured in `sys.config` under the `pgo` application key. Add this to your `dev_sys.config.src`:
 
 ```erlang
-{my_first_nova, [
-    {db, #{
-        host => "localhost",
-        port => 5432,
-        database => "my_first_nova_dev",
-        username => "postgres",
-        password => "postgres"
-    }}
+{pgo, [
+    {pools, [
+        {default, #{
+            pool_size => 10,
+            host => "localhost",
+            port => 5432,
+            database => "my_first_nova_dev",
+            user => "postgres",
+            password => "postgres"
+        }}
+    ]}
 ]}
 ```
 
-### Connection management
+The `default` pool is what `pgo:query/2` uses when you don't specify a pool name. The `pool_size` controls how many connections pgo keeps open.
 
-We need a process to manage our database connection. Create `src/my_first_nova_db.erl`:
-
-```erlang
--module(my_first_nova_db).
--behaviour(gen_server).
-
--export([start_link/0,
-         get_connection/0]).
-
--export([init/1,
-         handle_call/3,
-         handle_cast/2,
-         handle_info/2]).
-
-start_link() ->
-    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
-
-get_connection() ->
-    gen_server:call(?MODULE, get_connection).
-
-init([]) ->
-    {ok, DbConfig} = application:get_env(my_first_nova, db),
-    #{host := Host, port := Port, database := Database,
-      username := Username, password := Password} = DbConfig,
-    case epgsql:connect(Host, Username, Password,
-                        #{database => Database, port => Port}) of
-        {ok, Conn} ->
-            {ok, #{conn => Conn}};
-        {error, Reason} ->
-            {stop, Reason}
-    end.
-
-handle_call(get_connection, _From, State = #{conn := Conn}) ->
-    {reply, {ok, Conn}, State};
-handle_call(_Request, _From, State) ->
-    {reply, {error, unknown_request}, State}.
-
-handle_cast(_Msg, State) ->
-    {noreply, State}.
-
-handle_info(_Info, State) ->
-    {noreply, State}.
-```
-
-This is a simple gen_server that holds a single database connection. For a production application you would want to use a connection pool like `poolboy`, but this keeps things simple for learning.
-
-### Adding to the supervision tree
-
-We need to start our database process under the supervisor. Update `src/my_first_nova_sup.erl`:
-
-```erlang
--module(my_first_nova_sup).
--behaviour(supervisor).
-
--export([start_link/0]).
--export([init/1]).
-
-start_link() ->
-    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
-
-init([]) ->
-    ChildSpecs = [
-        #{id => my_first_nova_db,
-          start => {my_first_nova_db, start_link, []},
-          restart => permanent,
-          type => worker}
-    ],
-    {ok, {#{strategy => one_for_all,
-            intensity => 0,
-            period => 1}, ChildSpecs}}.
-```
+That is it for setup. No gen_server needed, no connection manager, no supervision tree changes. pgo starts its own pool supervisor when the application boots.
 
 ### Creating a repository module
 
-Now let's create a module that handles our data operations. This is where we write our SQL queries. Create `src/my_first_nova_user_repo.erl`:
+Now let's create a module that handles our data operations. Create `src/my_first_nova_user_repo.erl`:
 
 ```erlang
 -module(my_first_nova_user_repo).
@@ -138,60 +75,55 @@ Now let's create a module that handles our data operations. This is where we wri
         ]).
 
 all() ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn, "SELECT id, name, email FROM users ORDER BY id", []) of
-        {ok, _Columns, Rows} ->
+    case pgo:query("SELECT id, name, email FROM users ORDER BY id") of
+        #{rows := Rows} ->
             {ok, [row_to_map(Row) || Row <- Rows]};
         {error, Reason} ->
             {error, Reason}
     end.
 
 get(Id) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn, "SELECT id, name, email FROM users WHERE id = $1", [Id]) of
-        {ok, _Columns, [Row]} ->
+    case pgo:query("SELECT id, name, email FROM users WHERE id = $1", [Id]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
-        {ok, _Columns, []} ->
+        #{rows := []} ->
             {error, not_found};
         {error, Reason} ->
             {error, Reason}
     end.
 
 create(Name, Email) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email",
-                       [Name, Email]) of
-        {ok, 1, _Columns, [Row]} ->
+    case pgo:query("INSERT INTO users (name, email) VALUES ($1, $2) RETURNING id, name, email",
+                   [Name, Email]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
         {error, Reason} ->
             {error, Reason}
     end.
 
 update(Id, Name, Email) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email",
-                       [Name, Email, Id]) of
-        {ok, 1, _Columns, [Row]} ->
+    case pgo:query("UPDATE users SET name = $1, email = $2 WHERE id = $3 RETURNING id, name, email",
+                   [Name, Email, Id]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
-        {ok, 0, _Columns, []} ->
+        #{rows := []} ->
             {error, not_found};
         {error, Reason} ->
             {error, Reason}
     end.
 
 delete(Id) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn, "DELETE FROM users WHERE id = $1", [Id]) of
-        {ok, 1} -> ok;
-        {ok, 0} -> {error, not_found};
+    case pgo:query("DELETE FROM users WHERE id = $1", [Id]) of
+        #{command := delete, num_rows := 1} -> ok;
+        #{num_rows := 0} -> {error, not_found};
         {error, Reason} -> {error, Reason}
     end.
 
 row_to_map({Id, Name, Email}) ->
     #{id => Id, name => Name, email => Email}.
 ```
+
+Notice how clean this is compared to managing connections manually. `pgo:query/1` and `pgo:query/2` handle the connection pooling transparently. The result is a map with a `rows` key containing tuples.
 
 ### Setting up the database
 
@@ -280,31 +212,60 @@ Don't forget to add the new routes for update and delete:
 }
 ```
 
-### Connection pooling
+### Named pools
 
-For production applications you should use connection pooling. A common choice is `poolboy`. Add it to your deps:
+If you need multiple databases or want separate pools for different workloads, you can configure named pools:
 
 ```erlang
-{deps, [
-        nova,
-        {flatlog, "0.1.2"},
-        {epgsql, "4.7.1"},
-        {poolboy, "1.5.2"}
-       ]}.
+{pgo, [
+    {pools, [
+        {default, #{
+            pool_size => 10,
+            host => "localhost",
+            database => "my_first_nova_dev",
+            user => "postgres",
+            password => "postgres"
+        }},
+        {readonly, #{
+            pool_size => 5,
+            host => "localhost",
+            database => "my_first_nova_dev",
+            user => "readonly_user",
+            password => "readonly_pass"
+        }}
+    ]}
+]}
 ```
 
-Then configure a pool in your sys.config and modify the db module to checkout/checkin connections from the pool instead of holding a single connection. We will keep using the simple approach for this series.
+Then query a specific pool:
+
+```erlang
+pgo:query(readonly, "SELECT count(*) FROM users", []).
+```
+
+### Transactions
+
+pgo supports transactions:
+
+```erlang
+pgo:transaction(fun() ->
+    pgo:query("INSERT INTO users (name, email) VALUES ($1, $2)", [Name, Email]),
+    pgo:query("INSERT INTO audit_log (action, target) VALUES ($1, $2)", [<<"create_user">>, Email])
+end).
+```
+
+If any query inside the transaction fails, the whole thing is rolled back.
 
 ### Other databases
 
-The same pattern works for any database. Some popular Erlang database drivers:
+The same repository pattern works for any database. Some popular Erlang database drivers:
 
-- **PostgreSQL**: `epgsql`, `pgo`
+- **PostgreSQL**: `pgo`, `epgsql`
 - **MySQL**: `mysql-otp`
 - **Redis**: `eredis`
 - **Mnesia**: Built into OTP, no external dependency needed
 - **SQLite**: `esqlite`
 
-The key idea is the same: create a connection manager, write repository modules for your data operations, and call them from your controllers.
+The key idea is the same: configure your driver, write repository modules for your data operations, and call them from your controllers.
 
 In the next article we will look at how to test Nova applications.

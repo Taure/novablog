@@ -49,60 +49,50 @@ Create `src/my_first_nova_note_repo.erl`:
         ]).
 
 all() ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "SELECT id, title, body, author, inserted_at FROM notes ORDER BY inserted_at DESC",
-                       []) of
-        {ok, _Cols, Rows} ->
+    case pgo:query("SELECT id, title, body, author, inserted_at FROM notes ORDER BY inserted_at DESC") of
+        #{rows := Rows} ->
             {ok, [row_to_map(Row) || Row <- Rows]};
         {error, Reason} ->
             {error, Reason}
     end.
 
 get(Id) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "SELECT id, title, body, author, inserted_at FROM notes WHERE id = $1",
-                       [Id]) of
-        {ok, _Cols, [Row]} ->
+    case pgo:query("SELECT id, title, body, author, inserted_at FROM notes WHERE id = $1",
+                   [Id]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
-        {ok, _Cols, []} ->
+        #{rows := []} ->
             {error, not_found};
         {error, Reason} ->
             {error, Reason}
     end.
 
 create(Title, Body, Author) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "INSERT INTO notes (title, body, author) VALUES ($1, $2, $3) "
-                       "RETURNING id, title, body, author, inserted_at",
-                       [Title, Body, Author]) of
-        {ok, 1, _Cols, [Row]} ->
+    case pgo:query("INSERT INTO notes (title, body, author) VALUES ($1, $2, $3) "
+                   "RETURNING id, title, body, author, inserted_at",
+                   [Title, Body, Author]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
         {error, Reason} ->
             {error, Reason}
     end.
 
 update(Id, Title, Body) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn,
-                       "UPDATE notes SET title = $1, body = $2, updated_at = NOW() WHERE id = $3 "
-                       "RETURNING id, title, body, author, inserted_at",
-                       [Title, Body, Id]) of
-        {ok, 1, _Cols, [Row]} ->
+    case pgo:query("UPDATE notes SET title = $1, body = $2, updated_at = NOW() WHERE id = $3 "
+                   "RETURNING id, title, body, author, inserted_at",
+                   [Title, Body, Id]) of
+        #{rows := [Row]} ->
             {ok, row_to_map(Row)};
-        {ok, 0, _Cols, []} ->
+        #{rows := []} ->
             {error, not_found};
         {error, Reason} ->
             {error, Reason}
     end.
 
 delete(Id) ->
-    {ok, Conn} = my_first_nova_db:get_connection(),
-    case epgsql:equery(Conn, "DELETE FROM notes WHERE id = $1", [Id]) of
-        {ok, 1} -> ok;
-        {ok, 0} -> {error, not_found};
+    case pgo:query("DELETE FROM notes WHERE id = $1", [Id]) of
+        #{command := delete, num_rows := 1} -> ok;
+        #{num_rows := 0} -> {error, not_found};
         {error, Reason} -> {error, Reason}
     end.
 

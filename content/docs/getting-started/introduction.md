@@ -1,11 +1,6 @@
 ---
 title: "Introduction and Prerequisites"
-date: 2024-07-01
 weight: 1
-tags: ["getting-started"]
-series: ["Nova Framework Guide"]
-series_order: 1
-summary: "What is the Nova Framework, why use it, and what you need to get started."
 ---
 ## Nova
 

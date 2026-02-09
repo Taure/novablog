@@ -1,11 +1,6 @@
 ---
 title: "Error Handling"
-date: 2024-10-21
-weight: 17
-tags: ["errors", "error-handling"]
-series: ["Nova Framework Guide"]
-series_order: 17
-summary: "Custom error pages, status code routes, and fallback controllers."
+weight: 3
 ---
 ## Error Handling
 

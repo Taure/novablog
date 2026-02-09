@@ -1,11 +1,6 @@
 ---
 title: "Database Integration"
-date: 2024-09-02
-weight: 10
-tags: ["database", "postgresql", "pgo"]
-series: ["Nova Framework Guide"]
-series_order: 10
-summary: "Integrating PostgreSQL with pgo for data persistence."
+weight: 1
 ---
 ## Database Integration
 

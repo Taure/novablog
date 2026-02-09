@@ -1,11 +1,6 @@
 ---
 title: "Sessions and Cookies"
-date: 2024-10-07
-weight: 15
-tags: ["sessions", "cookies", "auth"]
-series: ["Nova Framework Guide"]
-series_order: 15
-summary: "Managing user sessions with Nova's built-in session system."
+weight: 1
 ---
 ## Sessions and Cookies
 

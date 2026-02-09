@@ -1,11 +1,6 @@
 ---
 title: "WebSockets and Handlers"
-date: 2024-08-26
-weight: 9
-tags: ["websockets", "real-time"]
-series: ["Nova Framework Guide"]
-series_order: 9
-summary: "Real-time communication with WebSockets and Nova's handler system."
+weight: 2
 ---
 ## WebSockets and Handlers
 

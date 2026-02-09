@@ -1,11 +1,6 @@
 ---
-title: "Testing Nova Applications"
-date: 2024-09-09
-weight: 11
-tags: ["testing", "eunit", "common-test"]
-series: ["Nova Framework Guide"]
-series_order: 11
-summary: "Unit testing with EUnit and integration testing with Common Test."
+title: "Testing"
+weight: 2
 ---
 ## Testing Nova Applications
 

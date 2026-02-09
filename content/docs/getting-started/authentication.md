@@ -1,11 +1,6 @@
 ---
 title: "Adding Authentication"
-date: 2024-08-05
 weight: 6
-tags: ["auth", "security"]
-series: ["Nova Framework Guide"]
-series_order: 6
-summary: "Adding security modules to protect routes."
 ---
 ## Adding auth
 

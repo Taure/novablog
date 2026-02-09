@@ -1,11 +1,6 @@
 ---
 title: "Building a JSON API"
-date: 2024-08-19
-weight: 8
-tags: ["json", "rest", "api"]
-series: ["Nova Framework Guide"]
-series_order: 8
-summary: "Building REST API endpoints that return JSON responses."
+weight: 1
 ---
 ## Building a JSON API with Nova
 

@@ -1,11 +1,6 @@
 ---
 title: "Building a Full CRUD Application"
-date: 2024-09-16
-weight: 12
-tags: ["crud", "tutorial"]
-series: ["Nova Framework Guide"]
-series_order: 12
-summary: "Tying everything together into a complete CRUD application."
+weight: 1
 ---
 ## Building a Full CRUD Application
 

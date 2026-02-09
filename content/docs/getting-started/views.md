@@ -1,11 +1,6 @@
 ---
-title: "Views in Nova"
-date: 2024-07-29
+title: "Views"
 weight: 5
-tags: ["views", "erlydtl"]
-series: ["Nova Framework Guide"]
-series_order: 5
-summary: "Using ErlyDTL templates to render HTML views."
 ---
 ## Views
 

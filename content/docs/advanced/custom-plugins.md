@@ -1,11 +1,6 @@
 ---
 title: "Writing Custom Plugins"
-date: 2024-10-14
-weight: 16
-tags: ["plugins", "middleware"]
-series: ["Nova Framework Guide"]
-series_order: 16
-summary: "Building custom plugins — request logger, rate limiter, and request ID."
+weight: 2
 ---
 ## Writing Custom Plugins
 

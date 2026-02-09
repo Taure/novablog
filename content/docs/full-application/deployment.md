@@ -1,11 +1,6 @@
 ---
-title: "Deploying a Nova Application"
-date: 2024-09-23
-weight: 13
-tags: ["deployment", "otp", "releases"]
-series: ["Nova Framework Guide"]
-series_order: 13
-summary: "Building OTP releases, production config, and Docker deployment."
+title: "Deployment"
+weight: 2
 ---
 ## Deploying a Nova Application
 

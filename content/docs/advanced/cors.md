@@ -1,11 +1,6 @@
 ---
 title: "CORS"
-date: 2024-10-28
-weight: 18
-tags: ["cors", "api"]
-series: ["Nova Framework Guide"]
-series_order: 18
-summary: "Configuring CORS for API consumption from different domains."
+weight: 4
 ---
 ## CORS - Cross-Origin Resource Sharing
 

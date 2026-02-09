@@ -1,11 +1,6 @@
 ---
 title: "Create a New Nova Application"
-date: 2024-07-08
 weight: 2
-tags: ["getting-started", "rebar3"]
-series: ["Nova Framework Guide"]
-series_order: 2
-summary: "Create your first Nova application and explore the project structure."
 ---
 ## Create a new Nova application
 

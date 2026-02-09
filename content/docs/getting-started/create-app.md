@@ -1,10 +1,6 @@
 ---
-title: "Getting Started with Nova"
-date: 2024-07-08T00:00:00+00:00
+title: Create a New Nova Application
 weight: 2
-tags: ["nova", "erlang", "getting-started", "rebar3"]
-series: ["Nova Framework Guide"]
-summary: "Create your first Nova application and explore the project structure."
 ---
 
 ## Create a new Nova application

@@ -1,10 +1,6 @@
 ---
-title: "Adding Authentication"
-date: 2024-08-05T00:00:00+00:00
+title: Adding Authentication
 weight: 6
-tags: ["nova", "erlang", "auth", "security"]
-series: ["Nova Framework Guide"]
-summary: "Adding security modules to protect routes with authentication."
 ---
 
 ## Adding auth

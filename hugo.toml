@@ -1,48 +1,60 @@
 baseURL = 'https://taure.github.io/novablog/'
 languageCode = 'en-us'
 title = 'Nova Framework Guide'
-theme = 'PaperMod'
-[pagination]
-  pagerSize = 10
+theme = 'hextra'
 
-[params]
-  author = 'Taure'
-  description = 'A comprehensive guide to building web applications with the Nova Framework for Erlang'
-  showReadingTime = true
-  showShareButtons = false
-  showPostNavLinks = true
-  showBreadCrumbs = true
-  showCodeCopyButtons = true
-  defaultTheme = 'auto'
-  ShowToc = true
-  TocOpen = false
-
-  [params.homeInfoParams]
-    Title = 'Nova Framework Guide'
-    Content = 'A comprehensive tutorial series on building web applications with the Nova Framework for Erlang. From getting started to deployment.'
-
-  [[params.socialIcons]]
-    name = 'github'
-    url = 'https://github.com/Taure/novablog'
-
-[menu]
-  [[menu.main]]
-    identifier = 'posts'
-    name = 'All Posts'
-    url = '/posts/'
-    weight = 10
-  [[menu.main]]
-    identifier = 'tags'
-    name = 'Tags'
-    url = '/tags/'
-    weight = 20
+enableRobotsTXT = true
 
 [markup]
   [markup.highlight]
-    codeFences = true
-    guessSyntax = true
-    lineNos = false
-    style = 'monokai'
+    noClasses = false
+  [markup.goldmark.renderer]
+    unsafe = true
 
-[outputs]
-  home = ['HTML', 'RSS']
+[menu]
+  [[menu.main]]
+    identifier = 'guide'
+    name = 'Guide'
+    pageRef = '/docs'
+    weight = 1
+  [[menu.main]]
+    name = 'Search'
+    weight = 2
+    [menu.main.params]
+      type = 'search'
+  [[menu.main]]
+    name = 'GitHub'
+    weight = 3
+    url = 'https://github.com/novaframework/nova'
+    [menu.main.params]
+      icon = 'github'
+
+[params]
+  description = 'A comprehensive guide to building web applications with the Nova Framework for Erlang'
+
+  [params.theme]
+    default = 'system'
+    displayToggle = true
+
+  [params.navbar]
+    displayTitle = true
+    displayLogo = false
+
+  [params.footer]
+    enable = true
+    displayCopyright = false
+    displayPoweredBy = true
+
+  [params.search]
+    enable = true
+    type = 'flexsearch'
+    [params.search.flexsearch]
+      index = 'content'
+      tokenize = 'forward'
+
+  [params.highlight.copy]
+    enable = true
+    display = 'hover'
+
+  [params.page]
+    width = 'wide'

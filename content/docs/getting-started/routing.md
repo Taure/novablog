@@ -1,10 +1,6 @@
 ---
-title: "Routing in Nova"
-date: 2024-07-15T00:00:00+00:00
+title: Routing
 weight: 3
-tags: ["nova", "erlang", "routing"]
-series: ["Nova Framework Guide"]
-summary: "How routing works in Nova — prefixes, security, and environment-specific routes."
 ---
 
 ## Routing

@@ -1,10 +1,6 @@
 ---
-title: "Building a JSON API"
-date: 2024-08-19T00:00:00+00:00
-weight: 8
-tags: ["nova", "erlang", "json", "rest", "api"]
-series: ["Nova Framework Guide"]
-summary: "Building REST API endpoints that return JSON responses."
+title: Building a JSON API
+weight: 1
 ---
 
 ## Building a JSON API with Nova

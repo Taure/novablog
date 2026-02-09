@@ -1,10 +1,6 @@
 ---
-title: "Plugins in Nova"
-date: 2024-07-22T00:00:00+00:00
+title: Plugins
 weight: 4
-tags: ["nova", "erlang", "plugins", "middleware"]
-series: ["Nova Framework Guide"]
-summary: "Understanding Nova's plugin pipeline for pre-request and post-request processing."
 ---
 
 ## Plugins

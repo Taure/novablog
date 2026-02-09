@@ -1,10 +1,6 @@
 ---
-title: "Introduction to Nova and Prerequisites"
-date: 2024-07-01T00:00:00+00:00
+title: Introduction and Prerequisites
 weight: 1
-tags: ["nova", "erlang", "getting-started"]
-series: ["Nova Framework Guide"]
-summary: "What is the Nova Framework, why use it, and what you need to get started."
 ---
 
 

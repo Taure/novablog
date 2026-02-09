@@ -1,10 +1,6 @@
 ---
-title: "Testing Nova Applications"
-date: 2024-09-09T00:00:00+00:00
-weight: 11
-tags: ["nova", "erlang", "testing", "eunit", "common-test"]
-series: ["Nova Framework Guide"]
-summary: "Unit testing with EUnit and integration testing with Common Test."
+title: Testing
+weight: 2
 ---
 
 ## Testing Nova Applications

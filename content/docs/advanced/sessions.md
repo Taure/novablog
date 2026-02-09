@@ -1,10 +1,6 @@
 ---
-title: "Sessions and Cookies"
-date: 2024-10-07T00:00:00+00:00
-weight: 15
-tags: ["nova", "erlang", "sessions", "cookies", "auth"]
-series: ["Nova Framework Guide"]
-summary: "Managing user sessions with Nova's built-in session system."
+title: Sessions and Cookies
+weight: 1
 ---
 
 ## Sessions and Cookies

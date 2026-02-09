@@ -1,10 +1,6 @@
 ---
-title: "Pub/Sub in Nova"
-date: 2024-09-30T00:00:00+00:00
-weight: 14
-tags: ["nova", "erlang", "pubsub", "real-time"]
-series: ["Nova Framework Guide"]
-summary: "Real-time messaging with Nova's built-in pub/sub system."
+title: Pub/Sub
+weight: 3
 ---
 
 ## Pub/Sub in Nova

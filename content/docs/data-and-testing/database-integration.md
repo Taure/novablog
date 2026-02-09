@@ -1,10 +1,6 @@
 ---
-title: "Database Integration"
-date: 2024-09-02T00:00:00+00:00
-weight: 10
-tags: ["nova", "erlang", "database", "postgresql"]
-series: ["Nova Framework Guide"]
-summary: "Integrating PostgreSQL with pgo for data persistence."
+title: Database Integration
+weight: 1
 ---
 
 ## Database Integration

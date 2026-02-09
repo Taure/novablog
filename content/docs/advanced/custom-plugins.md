@@ -1,10 +1,6 @@
 ---
-title: "Writing Custom Plugins"
-date: 2024-10-14T00:00:00+00:00
-weight: 16
-tags: ["nova", "erlang", "plugins", "middleware"]
-series: ["Nova Framework Guide"]
-summary: "Building custom plugins — request logger, rate limiter, and request ID."
+title: Writing Custom Plugins
+weight: 2
 ---
 
 ## Writing Custom Plugins

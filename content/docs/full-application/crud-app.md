@@ -1,10 +1,6 @@
 ---
-title: "Building a Full CRUD Application"
-date: 2024-09-16T00:00:00+00:00
-weight: 12
-tags: ["nova", "erlang", "crud", "tutorial"]
-series: ["Nova Framework Guide"]
-summary: "Tying everything together into a complete CRUD application with HTML and JSON."
+title: Building a Full CRUD Application
+weight: 1
 ---
 
 ## Building a Full CRUD Application

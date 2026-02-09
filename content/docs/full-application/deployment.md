@@ -1,10 +1,6 @@
 ---
-title: "Deploying a Nova Application"
-date: 2024-09-23T00:00:00+00:00
-weight: 13
-tags: ["nova", "erlang", "deployment", "otp", "releases"]
-series: ["Nova Framework Guide"]
-summary: "Building OTP releases, production config, systemd, and Docker deployment."
+title: Deployment
+weight: 2
 ---
 
 ## Deploying a Nova Application

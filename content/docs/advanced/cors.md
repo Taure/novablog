@@ -1,10 +1,6 @@
 ---
-title: "CORS - Cross-Origin Resource Sharing"
-date: 2024-10-28T00:00:00+00:00
-weight: 18
-tags: ["nova", "erlang", "cors", "api"]
-series: ["Nova Framework Guide"]
-summary: "Configuring CORS for API consumption from different domains."
+title: CORS
+weight: 4
 ---
 
 ## CORS - Cross-Origin Resource Sharing

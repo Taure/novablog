@@ -1,10 +1,6 @@
 ---
-title: "Adding a Nova App to Your Application"
-date: 2024-08-12T00:00:00+00:00
+title: Adding a Nova App
 weight: 7
-tags: ["nova", "erlang", "sub-applications"]
-series: ["Nova Framework Guide"]
-summary: "Composing applications by mounting Nova sub-apps with prefixed routes."
 ---
 
 ## Adding a Nova app to your application

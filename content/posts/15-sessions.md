@@ -1,8 +1,12 @@
 ---
-title: Sessions and Cookies
-weight: 1
+title: "Sessions and Cookies"
+date: 2024-10-07
+weight: 15
+tags: ["sessions", "cookies", "auth"]
+series: ["Nova Framework Guide"]
+series_order: 15
+summary: "Managing user sessions with Nova's built-in session system."
 ---
-
 ## Sessions and Cookies
 
 In the authentication article we built a simple login that works with a form POST. But if you navigate to another page the auth is lost because there is no session. In this article we will look at how Nova handles sessions so we can keep users logged in across requests.

@@ -1,8 +1,12 @@
 ---
-title: Deployment
-weight: 2
+title: "Deploying a Nova Application"
+date: 2024-09-23
+weight: 13
+tags: ["deployment", "otp", "releases"]
+series: ["Nova Framework Guide"]
+series_order: 13
+summary: "Building OTP releases, production config, and Docker deployment."
 ---
-
 ## Deploying a Nova Application
 
 In development we have been using `rebar3 nova serve` which gives us hot-reloading and debug logging. For production we need to build a proper OTP release. In this article we will look at how releases work, production configuration, and how to deploy a Nova application.

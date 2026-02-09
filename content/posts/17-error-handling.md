@@ -1,8 +1,12 @@
 ---
-title: Error Handling
-weight: 3
+title: "Error Handling"
+date: 2024-10-21
+weight: 17
+tags: ["errors", "error-handling"]
+series: ["Nova Framework Guide"]
+series_order: 17
+summary: "Custom error pages, status code routes, and fallback controllers."
 ---
-
 ## Error Handling
 
 When something goes wrong in your application you want to show a useful error page instead of a cryptic error. In this article we will look at how Nova handles errors and how to create custom error pages.

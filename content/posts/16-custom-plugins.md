@@ -1,8 +1,12 @@
 ---
-title: Writing Custom Plugins
-weight: 2
+title: "Writing Custom Plugins"
+date: 2024-10-14
+weight: 16
+tags: ["plugins", "middleware"]
+series: ["Nova Framework Guide"]
+series_order: 16
+summary: "Building custom plugins — request logger, rate limiter, and request ID."
 ---
-
 ## Writing Custom Plugins
 
 In the plugins article we looked at how Nova's built-in plugins work. In this article we will build our own plugins from scratch. A plugin lets you run code before or after every request — logging, rate limiting, adding headers, or anything else you need in the pipeline.

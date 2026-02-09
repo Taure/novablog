@@ -1,8 +1,12 @@
 ---
-title: Building a Full CRUD Application
-weight: 1
+title: "Building a Full CRUD Application"
+date: 2024-09-16
+weight: 12
+tags: ["crud", "tutorial"]
+series: ["Nova Framework Guide"]
+series_order: 12
+summary: "Tying everything together into a complete CRUD application."
 ---
-
 ## Building a Full CRUD Application
 
 In this article we will tie together everything we have learned in the series so far. We will build a complete CRUD (Create, Read, Update, Delete) application with both an HTML frontend using ErlyDTL templates and a JSON API backend. The application will manage a list of notes.

@@ -1,8 +1,12 @@
 ---
-title: Create a New Nova Application
+title: "Create a New Nova Application"
+date: 2024-07-08
 weight: 2
+tags: ["getting-started", "rebar3"]
+series: ["Nova Framework Guide"]
+series_order: 2
+summary: "Create your first Nova application and explore the project structure."
 ---
-
 ## Create a new Nova application
 
 We mentioned before that we wanted to get away from the hazzle of starting new things. To make it easier to install we have made this script. This one will check for rebar3 and if you don't have it install. Also it will add `rebar3_nova`, with that you will have some templates that will help you create your first Nova app.

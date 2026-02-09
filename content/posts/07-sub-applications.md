@@ -1,8 +1,12 @@
 ---
-title: Adding a Nova App
+title: "Adding a Nova App"
+date: 2024-08-12
 weight: 7
+tags: ["sub-applications"]
+series: ["Nova Framework Guide"]
+series_order: 7
+summary: "Composing applications by mounting Nova sub-apps."
 ---
-
 ## Adding a Nova app to your application
 
 We have talked about views, we have touched controllers and we have talked about routing.

@@ -1,8 +1,12 @@
 ---
-title: Views
+title: "Views in Nova"
+date: 2024-07-29
 weight: 5
+tags: ["views", "erlydtl"]
+series: ["Nova Framework Guide"]
+series_order: 5
+summary: "Using ErlyDTL templates to render HTML views."
 ---
-
 ## Views
 
 Nova is using `ErlyDTL` to tempalte the views, that is an Erlang version of Django templating.

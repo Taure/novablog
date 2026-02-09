@@ -1,8 +1,12 @@
 ---
-title: WebSockets and Handlers
-weight: 2
+title: "WebSockets and Handlers"
+date: 2024-08-26
+weight: 9
+tags: ["websockets", "real-time"]
+series: ["Nova Framework Guide"]
+series_order: 9
+summary: "Real-time communication with WebSockets and Nova's handler system."
 ---
-
 ## WebSockets and Handlers
 
 In previous articles we have been working with HTTP requests and responses. But sometimes you need real-time communication between the server and the client. This is where WebSockets come in.

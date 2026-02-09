@@ -1,8 +1,12 @@
 ---
-title: CORS
-weight: 4
+title: "CORS"
+date: 2024-10-28
+weight: 18
+tags: ["cors", "api"]
+series: ["Nova Framework Guide"]
+series_order: 18
+summary: "Configuring CORS for API consumption from different domains."
 ---
-
 ## CORS - Cross-Origin Resource Sharing
 
 If you are building an API that is consumed by a frontend running on a different domain, the browser will block the requests unless your server sends the right CORS headers. Nova includes a CORS plugin that handles this for you.

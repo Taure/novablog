@@ -1,8 +1,12 @@
 ---
-title: Testing
-weight: 2
+title: "Testing Nova Applications"
+date: 2024-09-09
+weight: 11
+tags: ["testing", "eunit", "common-test"]
+series: ["Nova Framework Guide"]
+series_order: 11
+summary: "Unit testing with EUnit and integration testing with Common Test."
 ---
-
 ## Testing Nova Applications
 
 Nova does not ship with its own testing framework. Instead we use Erlang's built-in testing tools: EUnit for unit tests and Common Test for integration tests. In this article we will look at how to test controllers, repository modules and HTTP endpoints.

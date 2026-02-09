@@ -1,8 +1,12 @@
 ---
-title: Routing
+title: "Routing in Nova"
+date: 2024-07-15
 weight: 3
+tags: ["routing"]
+series: ["Nova Framework Guide"]
+series_order: 3
+summary: "How routing works — prefixes, security, and environment-specific routes."
 ---
-
 ## Routing
 
 Here I will write about routing in Nova and how it works.

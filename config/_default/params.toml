@@ -1,0 +1,61 @@
+colorScheme = "terminal"
+defaultAppearance = "dark"
+autoSwitchAppearance = true
+
+enableSearch = true
+enableCodeCopy = true
+enableStructuredBreadcrumbs = true
+enableStyledScrollbar = true
+mainSections = ["posts"]
+smartTOC = true
+
+[header]
+  layout = "fixed"
+
+[footer]
+  showMenu = true
+  showCopyright = false
+  showThemeAttribution = true
+  showAppearanceSwitcher = true
+  showScrollToTop = true
+
+[homepage]
+  layout = "profile"
+  showRecent = true
+  showRecentItems = 10
+  showMoreLink = true
+  showMoreLinkDest = "/posts"
+  cardView = true
+  cardViewScreenWidth = false
+
+[article]
+  showDate = true
+  showAuthor = false
+  showBreadcrumbs = true
+  showHeadingAnchors = true
+  showPagination = true
+  showReadingTime = true
+  showTableOfContents = true
+  showRelatedContent = true
+  relatedContentLimit = 3
+  showTaxonomies = true
+  showWordCount = false
+  seriesOpened = true
+
+[list]
+  showBreadcrumbs = true
+  showSummary = true
+  showTableOfContents = false
+  showCards = true
+  orderByWeight = true
+  groupByYear = false
+  cardView = true
+
+[taxonomy]
+  showTermCount = true
+  cardView = true
+
+[term]
+  showTableOfContents = false
+  groupByYear = false
+  cardView = true

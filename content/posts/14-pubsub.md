@@ -1,8 +1,12 @@
 ---
-title: Pub/Sub
-weight: 3
+title: "Pub/Sub in Nova"
+date: 2024-09-30
+weight: 14
+tags: ["pubsub", "real-time"]
+series: ["Nova Framework Guide"]
+series_order: 14
+summary: "Real-time messaging with Nova's built-in pub/sub system."
 ---
-
 ## Pub/Sub in Nova
 
 In the WebSocket article we briefly used `nova_pubsub` to broadcast chat messages. In this article we will dive deeper into Nova's pub/sub system and build a real-time notification feature for our notes application.

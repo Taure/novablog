@@ -1,8 +1,12 @@
 ---
-title: Plugins
+title: "Plugins in Nova"
+date: 2024-07-22
 weight: 4
+tags: ["plugins", "middleware"]
+series: ["Nova Framework Guide"]
+series_order: 4
+summary: "Understanding Nova's plugin pipeline for request processing."
 ---
-
 ## Plugins
 
 ![Image description](https://dev-to-uploads.s3.amazonaws.com/uploads/articles/v21alnncsiqd9p6rkjmq.png)

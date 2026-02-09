@@ -1,0 +1,17 @@
+languageCode = "en"
+languageName = "English"
+weight = 1
+title = "Nova Framework Guide"
+
+[params]
+  displayName = "English"
+  isoCode = "en"
+  dateFormat = "2 January 2006"
+  description = "A comprehensive guide to building web applications with the Nova Framework for Erlang"
+
+[params.author]
+  name = "Taure"
+  headline = "Nova Framework"
+  links = [
+    { github = "https://github.com/novaframework/nova" },
+  ]

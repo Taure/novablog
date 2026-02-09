@@ -1,8 +1,12 @@
 ---
-title: Database Integration
-weight: 1
+title: "Database Integration"
+date: 2024-09-02
+weight: 10
+tags: ["database", "postgresql", "pgo"]
+series: ["Nova Framework Guide"]
+series_order: 10
+summary: "Integrating PostgreSQL with pgo for data persistence."
 ---
-
 ## Database Integration
 
 Nova is a web framework and does not include a built-in ORM or database layer. This is by design, you are free to use whatever database and driver fits your project. In this article we will look at how to integrate PostgreSQL using `pgo` and structure our data access code.

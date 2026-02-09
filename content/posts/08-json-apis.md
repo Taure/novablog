@@ -1,8 +1,12 @@
 ---
-title: Building a JSON API
-weight: 1
+title: "Building a JSON API"
+date: 2024-08-19
+weight: 8
+tags: ["json", "rest", "api"]
+series: ["Nova Framework Guide"]
+series_order: 8
+summary: "Building REST API endpoints that return JSON responses."
 ---
-
 ## Building a JSON API with Nova
 
 So far in this series we have been rendering HTML views with ErlyDTL templates. But what if we want to build a REST API that returns JSON? Nova makes this straightforward.

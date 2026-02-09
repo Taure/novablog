@@ -28,6 +28,13 @@
 * [Deployment](13-deployment.md)
 * [Pub/Sub](14-pubsub.md)
 
+### Advanced topics
+
+* [Sessions and cookies](15-sessions-and-cookies.md)
+* [Writing custom plugins](16-writing-custom-plugins.md)
+* [Error handling](17-error-handling.md)
+* [CORS](18-cors.md)
+
 ### Nova docs
 
 * [Docs](https://hexdocs.pm/nova/quick-start.html)

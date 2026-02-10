@@ -28,7 +28,7 @@ show(#{bindings := #{<<"id">> := Id}}) ->
 show(_Req) ->
     {status, 400, #{}, #{error => <<"missing id">>}}.
 
-create(#{params := #{<<"name">> := Name, <<"email">> := Email}}) ->
+create(#{json := #{<<"name">> := Name, <<"email">> := Email}}) ->
     {json, 201, #{}, #{id => 3, name => Name, email => Email}};
 create(_Req) ->
     {status, 422, #{}, #{error => <<"name and email required">>}}.
@@ -40,7 +40,7 @@ Let's look at what is happening here.
 
 `show/1` uses `bindings` from the request map. When we define a route with a path parameter like `"/users/:id"`, Nova will put the matched value in the bindings map.
 
-`create/1` uses `params` to read the decoded request body. We return `{json, 201, #{}, Data}` which lets us set a custom status code. The third element is a map of extra headers if we need them.
+`create/1` uses `json` to read the decoded request body. When `decode_json_body` is enabled, the `nova_request_plugin` decodes the JSON body and puts it under the `json` key of the request map. We return `{json, 201, #{}, Data}` which lets us set a custom status code. The third element is a map of extra headers if we need them.
 
 ### Adding the routes
 
@@ -92,7 +92,7 @@ For our POST endpoint we need Nova to decode the incoming JSON body. We update t
 ]}
 ```
 
-With `decode_json_body => true`, the `nova_request_plugin` will decode incoming JSON bodies and put them in the `params` key of the request map. We keep `read_urlencoded_body` for our login form.
+With `decode_json_body => true`, the `nova_request_plugin` will decode incoming JSON bodies and put them in the `json` key of the request map. Note that URL-encoded form bodies use the `params` key instead. We keep `read_urlencoded_body` for our login form.
 
 ### JSON library
 

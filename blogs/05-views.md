@@ -24,7 +24,7 @@ We want to create a simple view that have to input fields that will send in user
 </html>
 ```
 
-As you can see in this html we will send a post to the endpoint `/login`.
+As you can see in this html we will send a post to the endpoint `/`.
 
 ## Controller
 

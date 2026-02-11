@@ -33,8 +33,7 @@ Add `opentelemetry_nova` and the OpenTelemetry SDK to your `rebar.config`:
     {opentelemetry, "~> 1.5"},
     {opentelemetry_experimental, "~> 0.5"},
     {opentelemetry_exporter, "~> 1.8"},
-    {opentelemetry_nova, {git, "https://github.com/novaframework/opentelemetry_nova.git",
-                          {branch, "main"}}}
+    opentelemetry_nova
 ]}.
 ```
 

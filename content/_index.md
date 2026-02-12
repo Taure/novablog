@@ -19,5 +19,8 @@ This guide takes you from setting up your first Nova application all the way to 
 - Building a complete CRUD application
 - Deploying with OTP releases, systemd, and Docker
 - Sessions, custom plugins, error handling, and CORS
+- Code generators for scaffolding controllers, resources, routers and tests
+- Generating OpenAPI specs and Swagger UI from your routes
+- Inspecting configuration, middleware chains and running security audits
 
 Start with the [Introduction](docs/getting-started/introduction/) or browse the sidebar to jump to any topic.

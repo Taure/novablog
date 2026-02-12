@@ -120,7 +120,16 @@ Note that for the `row_to_map` test to work, you need to export the function. Yo
 
 Common Test is Erlang's integration testing framework. It is suited for testing the full HTTP stack. The `nova_test` module provides an HTTP client that handles application startup, port discovery and JSON encoding so you can focus on writing tests.
 
-Create the test suite `test/my_first_nova_api_SUITE.erl`:
+You can scaffold a Common Test suite with the `rebar3_nova` generator:
+
+```shell
+$ rebar3 nova gen_test --name users
+===> Writing test/my_first_nova_users_controller_SUITE.erl
+```
+
+This creates a suite with test cases for each CRUD action (list, show, create, update, delete) that make HTTP requests against your running application. It is a good starting point that you can extend with your own assertions. See the [Code Generators](../../developer-tools/code-generators/) article for the full details.
+
+Here is what a hand-written suite looks like using `nova_test`. Create the test suite `test/my_first_nova_api_SUITE.erl`:
 
 ```erlang
 -module(my_first_nova_api_SUITE).

@@ -10,14 +10,6 @@ When we generate a new Nova app we will have a routing file within our src direc
 
 The file is named in our example `my_first_nova_router.erl` in that file we have a function that has a list of Erlang maps that will specify and configure what rules are for an endpoint.
 
-If you need additional routers (for example to split your API into versioned modules), you can scaffold one with the `rebar3_nova` generator:
-
-```shell
-$ rebar3 nova gen_router --name api_v1 --prefix /api/v1
-===> Writing src/my_first_nova_api_v1_router.erl
-```
-
-This creates a router module implementing the `nova_router` behaviour with the prefix already set. See the [Code Generators](../../developer-tools/code-generators/) article for more details.
 
 ```erlang
 -module(my_first_nova_router).

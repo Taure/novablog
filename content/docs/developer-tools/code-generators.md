@@ -4,7 +4,7 @@ weight: 1
 ---
 ## Code Generators
 
-The `rebar3_nova` plugin ships with several generators that scaffold controllers, routers, resources and test suites. Instead of copy-pasting boilerplate by hand you can run a single command and get a working starting point.
+The `rebar3_nova` plugin ships with several generators that scaffold controllers, resources and test suites. Instead of copy-pasting boilerplate by hand you can run a single command and get a working starting point.
 
 ### Generate a controller
 
@@ -51,32 +51,6 @@ delete(_Req) ->
 ```
 
 Every action returns a valid Nova response tuple so you can compile and run immediately. Replace the `TODO` values with your actual logic.
-
-### Generate a router
-
-The `nova gen_router` command creates a router module that implements the `nova_router` behaviour. This is useful when you want to split your routes into multiple files.
-
-```shell
-$ rebar3 nova gen_router --name api_v1 --prefix /api/v1
-===> Writing src/my_first_nova_api_v1_router.erl
-```
-
-The generated module:
-
-```erlang
--module(my_first_nova_api_v1_router).
--behaviour(nova_router).
-
--export([routes/0, prefix/0]).
-
-prefix() ->
-    "/api/v1".
-
-routes() ->
-    [].
-```
-
-Add your routes to the `routes/0` function and register the router in your application.
 
 ### Generate a full resource
 

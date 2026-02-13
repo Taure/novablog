@@ -199,6 +199,206 @@ generate_id() ->
             [io_lib:format("~2.16.0b", [B]) || <<B:8>> <= Bytes])).
 ```
 
+### Example 4: Metrics enrichment with Cowboy
+
+Cowboy has a built-in metrics stream handler called `cowboy_metrics_h`. It collects timing, status codes and body sizes for every request, then calls your callback with a metrics map when the request finishes. The interesting part is that you can **push custom data into those metrics from your plugin** using `cowboy_req:cast/2`.
+
+This is powerful because it lets your plugins tag requests with business-level metadata — route names, user IDs, feature flags — and have it arrive automatically in your metrics pipeline.
+
+#### How it works
+
+1. You add `cowboy_metrics_h` to the Cowboy stream handler chain
+2. You provide a `metrics_callback` function that receives metrics at the end of each request
+3. From any plugin (or handler), you call `cowboy_req:cast({set_options, #{metrics_user_data => YourMap}}, Req)` to attach custom data
+4. The custom data shows up in the `user_data` field of the metrics map delivered to your callback
+
+The `cast` sends a message to the connection process, which flows through the stream handler chain. `cowboy_metrics_h` intercepts `set_options` commands and merges `metrics_user_data` into its accumulated state. You can call it multiple times — values are merged.
+
+#### Setting up the stream handler
+
+First, configure Cowboy to include `cowboy_metrics_h` and a callback. In `dev_sys.config.src`:
+
+```erlang
+{cowboy_configuration, #{
+    port => 8080,
+    stream_handlers => [cowboy_metrics_h, nova_stream_h,
+                        cowboy_compress_h, cowboy_stream_h],
+    options => #{
+        compress => true,
+        metrics_callback => fun my_first_nova_metrics:record/1
+    }
+}}
+```
+
+`cowboy_metrics_h` must come before `cowboy_stream_h` in the chain so it wraps the full request lifecycle.
+
+#### The metrics collector
+
+We need somewhere for the callback to send data. Here is a simple gen_server backed by ETS:
+
+```erlang
+-module(my_first_nova_metrics).
+-behaviour(gen_server).
+
+-export([start_link/0, record/1, get_metrics/0, get_recent/1]).
+-export([init/1, handle_call/3, handle_cast/2]).
+
+-define(TABLE, my_first_nova_metrics_tab).
+-define(MAX_RECENT, 100).
+
+start_link() ->
+    gen_server:start_link({local, ?MODULE}, ?MODULE, [], []).
+
+%% This is the metrics_callback — called by cowboy_metrics_h
+record(Metrics) ->
+    gen_server:cast(?MODULE, {record, Metrics}).
+
+get_metrics() ->
+    gen_server:call(?MODULE, get_metrics).
+
+get_recent(N) ->
+    gen_server:call(?MODULE, {get_recent, N}).
+
+init([]) ->
+    ets:new(?TABLE, [named_table, ordered_set, protected]),
+    {ok, #{counter => 0}}.
+
+handle_cast({record, Metrics}, #{counter := Count} = State) ->
+    UserData = maps:get(user_data, Metrics, #{}),
+    ReqStart = maps:get(req_start, Metrics, 0),
+    ReqEnd = maps:get(req_end, Metrics, ReqStart),
+    DurationUs = erlang:convert_time_unit(ReqEnd - ReqStart, native, microsecond),
+    Entry = #{
+        method => maps:get(method, UserData, unknown),
+        path => maps:get(path, UserData, unknown),
+        tag => maps:get(tag, UserData, undefined),
+        status => maps:get(resp_status, Metrics, 0),
+        duration_us => DurationUs,
+        resp_body_length => maps:get(resp_body_length, Metrics, 0)
+    },
+    Key = {erlang:monotonic_time(), Count},
+    ets:insert(?TABLE, {Key, Entry}),
+    {noreply, State#{counter => Count + 1}};
+handle_cast(_Msg, State) ->
+    {noreply, State}.
+
+handle_call(get_metrics, _From, State = #{counter := Count}) ->
+    Entries = ets:tab2list(?TABLE),
+    {reply, #{total_requests => Count, entries => Entries}, State};
+handle_call({get_recent, N}, _From, State) ->
+    %% Take last N entries from ordered_set
+    Recent = take_last(?TABLE, ets:last(?TABLE), N, []),
+    {reply, Recent, State};
+handle_call(_Msg, _From, State) ->
+    {reply, ok, State}.
+
+take_last(_Table, '$end_of_table', _N, Acc) -> Acc;
+take_last(_Table, _Key, 0, Acc) -> Acc;
+take_last(Table, Key, N, Acc) ->
+    [{_, Entry}] = ets:lookup(Table, Key),
+    take_last(Table, ets:prev(Table, Key), N - 1, [Entry | Acc]).
+```
+
+Start it under your supervisor so it is running before Cowboy starts handling requests.
+
+#### The plugin
+
+Now we write the plugin that pushes data into the metrics stream:
+
+```erlang
+-module(my_first_nova_metrics_plugin).
+-behaviour(nova_plugin).
+
+-export([pre_request/2, post_request/2, plugin_info/0]).
+
+pre_request(Req, Options) ->
+    Method = cowboy_req:method(Req),
+    Path = cowboy_req:path(Req),
+    UserData0 = #{method => Method, path => Path},
+    UserData = case maps:get(tag, Options, undefined) of
+        undefined -> UserData0;
+        Tag -> UserData0#{tag => Tag}
+    end,
+    cowboy_req:cast({set_options, #{metrics_user_data => UserData}}, Req),
+    {ok, Req}.
+
+post_request(Req, _Options) ->
+    {ok, Req}.
+
+plugin_info() ->
+    {<<"my_first_nova_metrics_plugin">>,
+     <<"1.0.0">>,
+     <<"My First Nova">>,
+     <<"Enriches Cowboy metrics with request metadata">>,
+     [{tag, <<"Optional tag to label routes in metrics">>}]}.
+```
+
+The key line is `cowboy_req:cast({set_options, #{metrics_user_data => UserData}}, Req)`. This sends a message to the connection process carrying our custom data. `cowboy_metrics_h` picks it up and merges it into the `user_data` map that arrives in the `record/1` callback.
+
+#### Register the plugin
+
+Add it to your plugins list in `sys.config`:
+
+```erlang
+{plugins, [
+    {pre_request, nova_request_plugin, #{decode_json_body => true}},
+    {pre_request, my_first_nova_metrics_plugin, #{}}
+]}
+```
+
+Or tag specific route groups:
+
+```erlang
+#{prefix => "/api",
+  plugins => [
+      {pre_request, my_first_nova_metrics_plugin, #{tag => <<"api">>}}
+  ],
+  routes => [...]
+}
+```
+
+#### Seeing it in action
+
+Start the application and make some requests:
+
+```shell
+curl http://localhost:8080/api/users
+curl http://localhost:8080/api/products
+curl http://localhost:8080/api/metrics/recent
+```
+
+The last request returns the collected metrics including your custom data:
+
+```json
+{
+  "requests": [
+    {
+      "method": "GET",
+      "path": "/api/users",
+      "tag": "api",
+      "status": 200,
+      "duration_us": 1234,
+      "resp_body_length": 95
+    },
+    {
+      "method": "GET",
+      "path": "/api/products",
+      "status": 200,
+      "duration_us": 987,
+      "resp_body_length": 142
+    }
+  ]
+}
+```
+
+The `method`, `path` and `tag` fields all came from the plugin via `metrics_user_data`. The `status`, `duration_us` and `resp_body_length` came from Cowboy's built-in metrics collection. Both arrive together in a single callback.
+
+#### Why this matters
+
+The standard approach of measuring things inside your handler (like the logger plugin in Example 1) only captures the handler's processing time. The `cowboy_metrics_h` approach captures the **full request lifecycle** — from when Cowboy starts parsing the request to when the last byte of the response is sent. It also captures body sizes, subprocess timing and informational responses automatically.
+
+By combining this with plugins that tag requests via `metrics_user_data`, you get production-grade observability without instrumenting every handler individually.
+
 ### Per-route plugins
 
 You can also set plugins on specific route groups instead of globally. This is useful when you want different behaviour for your API versus your HTML pages:

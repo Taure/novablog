@@ -35,5 +35,12 @@ routes(_Environment) ->
                  {"/products/:id", fun my_first_nova_products_controller:update/1, #{methods => [put]}},
                  {"/products/:id", fun my_first_nova_products_controller:delete/1, #{methods => [delete]}}
                 ]
+     },
+    #{prefix => "/api",
+      security => false,
+      routes => [
+                 {"/metrics", fun my_first_nova_metrics_controller:summary/1, #{methods => [get]}},
+                 {"/metrics/recent", fun my_first_nova_metrics_controller:recent/1, #{methods => [get]}}
+                ]
      }
    ].

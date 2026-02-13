@@ -18,7 +18,13 @@
          {use_stacktrace, true},
          {environment, dev},
          {cowboy_configuration, #{
-                                  port => 8080
+                                  port => 8080,
+                                  stream_handlers => [cowboy_metrics_h, nova_stream_h,
+                                                      cowboy_compress_h, cowboy_stream_h],
+                                  options => #{
+                                      compress => true,
+                                      metrics_callback => fun my_first_nova_metrics:record/1
+                                  }
                                  }},
          {dev_mode, true},
          {bootstrap_application, my_first_nova}, %% Bootstraps the application
@@ -26,7 +32,8 @@
          %% Priority is that the lowest number is executed first
          {plugins, [
                     {pre_request, nova_request_plugin, #{decode_json_body => true,
-                                                          read_urlencoded_body => true}}
+                                                          read_urlencoded_body => true}},
+                    {pre_request, my_first_nova_metrics_plugin, #{}}
                    ]}
         ]}
   %% Please change your app.src-file instead if you intend to add app-specific configurations

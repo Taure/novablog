@@ -28,7 +28,11 @@ start_link() ->
 
 %% Child :: {Id,StartFunc,Restart,Shutdown,Type,Modules}
 init([]) ->
-    {ok, { {one_for_all, 0, 1}, []} }.
+    Metrics = #{id => my_first_nova_metrics,
+                start => {my_first_nova_metrics, start_link, []},
+                restart => permanent,
+                type => worker},
+    {ok, { {one_for_all, 0, 1}, [Metrics]} }.
 
 %%====================================================================
 %% Internal functions

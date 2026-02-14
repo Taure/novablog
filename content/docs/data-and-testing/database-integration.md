@@ -272,4 +272,4 @@ The same repository pattern works for any database. Some popular Erlang database
 
 The key idea is the same: configure your driver, write repository modules for your data operations, and call them from your controllers.
 
-In the next article we will look at how to test Nova applications.
+In the next article we will look at [Kura](../kura/), an Ecto-inspired database layer that builds on pgo to give you schemas, changesets, automatic migrations and a query builder.

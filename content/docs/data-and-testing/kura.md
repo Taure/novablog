@@ -525,6 +525,98 @@ $ curl -s -X PUT localhost:8080/api/products/1 \
 $ curl -s -X DELETE localhost:8080/api/products/1
 ```
 
+### Enum types
+
+Kura supports enum fields that store as `VARCHAR(255)` in PostgreSQL and cast between atoms in Erlang and binaries in the database:
+
+```erlang
+fields() ->
+    [
+        #kura_field{name = id, type = id, primary_key = true, nullable = false},
+        #kura_field{name = status, type = {enum, [draft, published, archived]}},
+        #kura_field{name = title, type = string, nullable = false}
+    ].
+```
+
+Casting accepts atoms, binaries, or charlists and validates against the allowed values:
+
+```erlang
+CS = kura_changeset:cast(post, #{}, #{status => <<"published">>}, [title, status]),
+%% status is cast to the atom 'published'
+```
+
+No PostgreSQL `CREATE TYPE` is needed — the column is a plain `VARCHAR(255)`. Adding or removing enum values from your schema won't generate a new migration since the underlying column type doesn't change.
+
+### Query telemetry
+
+Enable query logging via `sys.config` under the `kura` application key:
+
+```erlang
+{kura, [
+    {log, true}
+]}.
+```
+
+This uses the built-in default logger (`logger:info`). You can also point to a custom handler:
+
+```erlang
+{kura, [
+    {log, {my_first_nova_telemetry, handle_query}}
+]}.
+```
+
+Each query emits an event map:
+
+```erlang
+#{query => <<"SELECT ...">>,
+  params => [...],
+  result => ok | error,
+  num_rows => 3,
+  duration_us => 1500,
+  repo => my_first_nova_repo}
+```
+
+Use this for slow query logging, metrics collection, or debugging during development. If `log` is absent or `false`, there is no overhead.
+
+### Nested changesets
+
+Use `cast_assoc` to cast nested parameters into child changesets for `has_many` or `has_one` associations:
+
+```erlang
+Params = #{
+    title => <<"My Post">>,
+    body => <<"Hello world">>,
+    comments => [
+        #{body => <<"Great post!">>},
+        #{body => <<"Thanks!">>}
+    ]
+},
+CS = kura_changeset:cast(post, #{}, Params, [title, body]),
+CS1 = kura_changeset:cast_assoc(CS, comments),
+{ok, Post} = my_first_nova_repo:insert(CS1).
+```
+
+When `assoc_changes` are present, `insert` automatically wraps the operation in a transaction: the parent is inserted first, then each child gets the parent's primary key set as its foreign key.
+
+You can provide a custom changeset function via the `with` option:
+
+```erlang
+CS1 = kura_changeset:cast_assoc(CS, comments, #{
+    with => fun(Data, ChildParams) ->
+        ChildCS = kura_changeset:cast(comment, Data, ChildParams, [body]),
+        kura_changeset:validate_required(ChildCS, [body])
+    end
+}).
+```
+
+For programmatic association building (not from user input), use `put_assoc`:
+
+```erlang
+CS1 = kura_changeset:put_assoc(CS, comments, [
+    #{body => <<"Auto-generated comment">>}
+]).
+```
+
 ### pgo vs kura
 
 | | pgo | kura |

@@ -36,18 +36,21 @@ record_and_get_metrics(_Pid) ->
 
 get_recent_returns_latest(_Pid) ->
     fun() ->
-        lists:foreach(fun(I) ->
-            M = #{
-                req_start => erlang:monotonic_time(),
-                req_end => erlang:monotonic_time(),
-                resp_status => 200,
-                req_body_length => 0,
-                resp_body_length => I,
-                user_data => #{method => <<"GET">>, path => <<"/test">>}
-            },
-            my_first_nova_metrics:record(M),
-            timer:sleep(5)
-        end, lists:seq(1, 5)),
+        lists:foreach(
+            fun(I) ->
+                M = #{
+                    req_start => erlang:monotonic_time(),
+                    req_end => erlang:monotonic_time(),
+                    resp_status => 200,
+                    req_body_length => 0,
+                    resp_body_length => I,
+                    user_data => #{method => <<"GET">>, path => <<"/test">>}
+                },
+                my_first_nova_metrics:record(M),
+                timer:sleep(5)
+            end,
+            lists:seq(1, 5)
+        ),
         timer:sleep(50),
         Recent = my_first_nova_metrics:get_recent(3),
         ?assertEqual(3, length(Recent)),

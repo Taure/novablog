@@ -1,14 +1,18 @@
 -module(my_first_nova_metrics).
 -behaviour(gen_server).
 
--export([start_link/0,
-         record/1,
-         get_metrics/0,
-         get_recent/1]).
+-export([
+    start_link/0,
+    record/1,
+    get_metrics/0,
+    get_recent/1
+]).
 
--export([init/1,
-         handle_call/3,
-         handle_cast/2]).
+-export([
+    init/1,
+    handle_call/3,
+    handle_cast/2
+]).
 
 -define(TABLE, my_first_nova_metrics_tab).
 -define(MAX_RECENT, 100).
@@ -69,21 +73,26 @@ extract_entry(Metrics) ->
     }.
 
 build_summary(Entries) ->
-    lists:foldl(fun({_Key, Entry}, Acc) ->
-        #{status := Status, duration_us := Dur, tag := Tag} = Entry,
-        StatusGroup = status_group(Status),
-        ByStatus = maps:get(by_status, Acc, #{}),
-        ByTag = maps:get(by_tag, Acc, #{}),
-        Durations = maps:get(durations_us, Acc, []),
-        Acc#{
-            by_status => maps:update_with(StatusGroup, fun(V) -> V + 1 end, 1, ByStatus),
-            by_tag => case Tag of
-                undefined -> ByTag;
-                _ -> maps:update_with(Tag, fun(V) -> V + 1 end, 1, ByTag)
-            end,
-            durations_us => [Dur | Durations]
-        }
-    end, #{by_status => #{}, by_tag => #{}, durations_us => []}, Entries).
+    lists:foldl(
+        fun({_Key, Entry}, Acc) ->
+            #{status := Status, duration_us := Dur, tag := Tag} = Entry,
+            StatusGroup = status_group(Status),
+            ByStatus = maps:get(by_status, Acc, #{}),
+            ByTag = maps:get(by_tag, Acc, #{}),
+            Durations = maps:get(durations_us, Acc, []),
+            Acc#{
+                by_status => maps:update_with(StatusGroup, fun(V) -> V + 1 end, 1, ByStatus),
+                by_tag =>
+                    case Tag of
+                        undefined -> ByTag;
+                        _ -> maps:update_with(Tag, fun(V) -> V + 1 end, 1, ByTag)
+                    end,
+                durations_us => [Dur | Durations]
+            }
+        end,
+        #{by_status => #{}, by_tag => #{}, durations_us => []},
+        Entries
+    ).
 
 status_group(S) when S >= 200, S < 300 -> <<"2xx">>;
 status_group(S) when S >= 300, S < 400 -> <<"3xx">>;

@@ -4,8 +4,14 @@
 
 username_password(#{params := Params}) ->
     case Params of
-        #{<<"username">> := Username,
-          <<"password">> := <<"password">>} -> {true, #{authed => true,
-                                                         username => Username}};
-        _ -> false
+        #{
+            <<"username">> := Username,
+            <<"password">> := <<"password">>
+        } ->
+            {true, #{
+                authed => true,
+                username => Username
+            }};
+        _ ->
+            false
     end.

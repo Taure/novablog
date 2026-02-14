@@ -4,100 +4,49 @@ weight: 1
 ---
 ## Building a Full CRUD Application
 
-In this article we will tie together everything we have learned in the series so far. We will build a complete CRUD (Create, Read, Update, Delete) application with both an HTML frontend using ErlyDTL templates and a JSON API backend. The application will manage a list of notes.
+In this article we will tie together everything we have learned in the series so far. We will build a complete CRUD (Create, Read, Update, Delete) application with both an HTML frontend using ErlyDTL templates and a JSON API backend. The application will manage a list of notes using [Kura](../../data-and-testing/kura/) for the database layer.
 
 ### The plan
 
 We will build a note-taking application with:
 - HTML pages for listing, creating and editing notes
 - JSON API endpoints for the same operations
-- Database persistence with PostgreSQL
+- Database persistence with PostgreSQL via Kura
 - Authentication for the HTML pages
 
-### Database setup
+### Note schema
 
-First, create the notes table:
-
-```sql
-CREATE TABLE notes (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(255) NOT NULL,
-    body TEXT,
-    author VARCHAR(255),
-    inserted_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
-);
-```
-
-### Repository module
-
-Create `src/my_first_nova_note_repo.erl`:
+Create `src/schemas/note.erl`:
 
 ```erlang
--module(my_first_nova_note_repo).
--export([
-         all/0,
-         get/1,
-         create/3,
-         update/3,
-         delete/1
-        ]).
+-module(note).
+-behaviour(kura_schema).
+-include_lib("kura/include/kura.hrl").
 
-all() ->
-    case pgo:query("SELECT id, title, body, author, inserted_at FROM notes ORDER BY inserted_at DESC") of
-        #{rows := Rows} ->
-            {ok, [row_to_map(Row) || Row <- Rows]};
-        {error, Reason} ->
-            {error, Reason}
-    end.
+-export([table/0, fields/0, primary_key/0]).
 
-get(Id) ->
-    case pgo:query("SELECT id, title, body, author, inserted_at FROM notes WHERE id = $1",
-                   [Id]) of
-        #{rows := [Row]} ->
-            {ok, row_to_map(Row)};
-        #{rows := []} ->
-            {error, not_found};
-        {error, Reason} ->
-            {error, Reason}
-    end.
+table() -> <<"notes">>.
+primary_key() -> id.
 
-create(Title, Body, Author) ->
-    case pgo:query("INSERT INTO notes (title, body, author) VALUES ($1, $2, $3) "
-                   "RETURNING id, title, body, author, inserted_at",
-                   [Title, Body, Author]) of
-        #{rows := [Row]} ->
-            {ok, row_to_map(Row)};
-        {error, Reason} ->
-            {error, Reason}
-    end.
-
-update(Id, Title, Body) ->
-    case pgo:query("UPDATE notes SET title = $1, body = $2, updated_at = NOW() WHERE id = $3 "
-                   "RETURNING id, title, body, author, inserted_at",
-                   [Title, Body, Id]) of
-        #{rows := [Row]} ->
-            {ok, row_to_map(Row)};
-        #{rows := []} ->
-            {error, not_found};
-        {error, Reason} ->
-            {error, Reason}
-    end.
-
-delete(Id) ->
-    case pgo:query("DELETE FROM notes WHERE id = $1", [Id]) of
-        #{command := delete, num_rows := 1} -> ok;
-        #{num_rows := 0} -> {error, not_found};
-        {error, Reason} -> {error, Reason}
-    end.
-
-row_to_map({Id, Title, Body, Author, InsertedAt}) ->
-    #{id => Id,
-      title => Title,
-      body => Body,
-      author => Author,
-      inserted_at => InsertedAt}.
+fields() ->
+    [
+        #kura_field{name = id, type = id, primary_key = true, nullable = false},
+        #kura_field{name = title, type = string, nullable = false},
+        #kura_field{name = body, type = text},
+        #kura_field{name = author, type = string},
+        #kura_field{name = inserted_at, type = utc_datetime},
+        #kura_field{name = updated_at, type = utc_datetime}
+    ].
 ```
+
+Compile to auto-generate the migration:
+
+```shell
+$ rebar3 compile
+===> kura: generated migration m20260214_create_notes
+```
+
+The generated migration creates the notes table for you — no SQL needed.
 
 ### JSON API controller
 
@@ -123,6 +72,8 @@ Create (or replace) `src/controllers/my_first_nova_notes_api_controller.erl`:
 
 ```erlang
 -module(my_first_nova_notes_api_controller).
+-include_lib("kura/include/kura.hrl").
+
 -export([
          index/1,
          show/1,
@@ -132,47 +83,53 @@ Create (or replace) `src/controllers/my_first_nova_notes_api_controller.erl`:
         ]).
 
 index(_Req) ->
-    {ok, Notes} = my_first_nova_note_repo:all(),
+    {ok, Notes} = my_first_nova_repo:all(kura_query:from(note)),
     {json, #{notes => Notes}}.
 
 show(#{bindings := #{<<"id">> := Id}}) ->
-    case my_first_nova_note_repo:get(binary_to_integer(Id)) of
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
         {ok, Note} ->
             {json, Note};
         {error, not_found} ->
             {status, 404, #{}, #{error => <<"note not found">>}}
     end.
 
-create(#{params := #{<<"title">> := Title, <<"body">> := Body,
-                     <<"author">> := Author}}) ->
-    case my_first_nova_note_repo:create(Title, Body, Author) of
+create(#{json := Params}) ->
+    CS = kura_changeset:cast(note, #{}, Params, [title, body, author]),
+    CS1 = kura_changeset:validate_required(CS, [title, author]),
+    case my_first_nova_repo:insert(CS1) of
         {ok, Note} ->
             {json, 201, #{}, Note};
-        {error, Reason} ->
-            {status, 422, #{}, #{error => list_to_binary(io_lib:format("~p", [Reason]))}}
-    end;
-create(_Req) ->
-    {status, 422, #{}, #{error => <<"title, body and author required">>}}.
+        {error, Changeset} ->
+            {status, 422, #{}, #{errors => Changeset#kura_changeset.errors}}
+    end.
 
-update(#{bindings := #{<<"id">> := Id},
-         params := #{<<"title">> := Title, <<"body">> := Body}}) ->
-    case my_first_nova_note_repo:update(binary_to_integer(Id), Title, Body) of
-        {ok, Note} ->
-            {json, Note};
+update(#{bindings := #{<<"id">> := Id}, json := Params}) ->
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
+        {ok, Existing} ->
+            CS = kura_changeset:cast(note, Existing, Params, [title, body]),
+            case my_first_nova_repo:update(CS) of
+                {ok, Updated} ->
+                    {json, Updated};
+                {error, Changeset} ->
+                    {status, 422, #{}, #{errors => Changeset#kura_changeset.errors}}
+            end;
         {error, not_found} ->
             {status, 404, #{}, #{error => <<"note not found">>}}
-    end;
-update(_Req) ->
-    {status, 422, #{}, #{error => <<"title and body required">>}}.
+    end.
 
 delete(#{bindings := #{<<"id">> := Id}}) ->
-    case my_first_nova_note_repo:delete(binary_to_integer(Id)) of
-        ok ->
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
+        {ok, Record} ->
+            CS = kura_changeset:cast(note, Record, #{}, []),
+            {ok, _} = my_first_nova_repo:delete(CS),
             {status, 204};
         {error, not_found} ->
             {status, 404, #{}, #{error => <<"note not found">>}}
     end.
 ```
+
+Compare this to the [raw pgo approach](../../data-and-testing/database-integration/) — no SQL strings, no positional parameters, no manual row conversion. Changesets handle validation before anything hits the database, and invalid requests get proper error responses automatically.
 
 ### HTML controller
 
@@ -180,6 +137,8 @@ Create `src/controllers/my_first_nova_notes_controller.erl` for the HTML views:
 
 ```erlang
 -module(my_first_nova_notes_controller).
+-include_lib("kura/include/kura.hrl").
+
 -export([
          index/1,
          new/1,
@@ -190,7 +149,8 @@ Create `src/controllers/my_first_nova_notes_controller.erl` for the HTML views:
         ]).
 
 index(#{auth_data := #{username := Username}}) ->
-    {ok, Notes} = my_first_nova_note_repo:all(),
+    Q = kura_query:order_by(kura_query:from(note), {inserted_at, desc}),
+    {ok, Notes} = my_first_nova_repo:all(Q),
     {ok, [{notes, Notes}, {username, Username}], #{view => notes_index}};
 index(_Req) ->
     {redirect, "/login"}.
@@ -201,15 +161,18 @@ new(_Req) ->
     {redirect, "/login"}.
 
 create(#{auth_data := #{username := Username},
-         params := #{<<"title">> := Title, <<"body">> := Body}}) ->
-    my_first_nova_note_repo:create(Title, Body, Username),
+         params := Params}) ->
+    Params1 = Params#{<<"author">> => Username},
+    CS = kura_changeset:cast(note, #{}, Params1, [title, body, author]),
+    CS1 = kura_changeset:validate_required(CS, [title, author]),
+    my_first_nova_repo:insert(CS1),
     {redirect, "/notes"};
 create(_Req) ->
     {redirect, "/login"}.
 
 edit(#{auth_data := #{authed := true},
        bindings := #{<<"id">> := Id}}) ->
-    case my_first_nova_note_repo:get(binary_to_integer(Id)) of
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
         {ok, Note} ->
             {ok, [{note, Note}], #{view => notes_edit}};
         {error, not_found} ->
@@ -220,15 +183,27 @@ edit(_Req) ->
 
 update(#{auth_data := #{authed := true},
          bindings := #{<<"id">> := Id},
-         params := #{<<"title">> := Title, <<"body">> := Body}}) ->
-    my_first_nova_note_repo:update(binary_to_integer(Id), Title, Body),
+         params := Params}) ->
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
+        {ok, Existing} ->
+            CS = kura_changeset:cast(note, Existing, Params, [title, body]),
+            my_first_nova_repo:update(CS);
+        _ ->
+            ok
+    end,
     {redirect, "/notes"};
 update(_Req) ->
     {redirect, "/login"}.
 
 delete(#{auth_data := #{authed := true},
          bindings := #{<<"id">> := Id}}) ->
-    my_first_nova_note_repo:delete(binary_to_integer(Id)),
+    case my_first_nova_repo:get(note, binary_to_integer(Id)) of
+        {ok, Record} ->
+            CS = kura_changeset:cast(note, Record, #{}, []),
+            my_first_nova_repo:delete(CS);
+        _ ->
+            ok
+    end,
     {redirect, "/notes"};
 delete(_Req) ->
     {redirect, "/login"}.
@@ -401,12 +376,12 @@ For the HTML interface, go to `localhost:8080/login`, log in and then navigate t
 Let's recap what we have in our application now:
 
 - **Router** with four route groups: public, auth, HTML notes with security, and a JSON API
-- **Controllers** for both HTML and JSON responses
+- **Controllers** for both HTML and JSON responses using Kura changesets for validation
 - **Views** using ErlyDTL templates with loops and variable interpolation
 - **Security** module for authentication
-- **Database** persistence with PostgreSQL
-- **Repository** module for clean data access
+- **Schema** defining the shape of our data with automatic migration generation
+- **Database** persistence with PostgreSQL via Kura's repo pattern
 
-This is the pattern that scales. As your application grows you add more repos, controllers, views, and route groups. Nova stays out of your way and lets you organize things with standard Erlang/OTP patterns.
+No raw SQL, no manual row conversions, no hand-written migrations. The schema is the single source of truth and everything else flows from it. As your application grows you add more schemas, controllers, views, and route groups. Nova stays out of your way and lets you organize things with standard Erlang/OTP patterns.
 
 In the next article we will look at how to deploy a Nova application to production.

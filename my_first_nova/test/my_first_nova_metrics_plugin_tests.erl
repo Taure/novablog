@@ -2,9 +2,13 @@
 -include_lib("eunit/include/eunit.hrl").
 
 pre_request_sets_method_and_path_test() ->
-    Req = #{pid => self(), streamid => 1,
-            method => <<"GET">>, path => <<"/api/users">>,
-            headers => #{}},
+    Req = #{
+        pid => self(),
+        streamid => 1,
+        method => <<"GET">>,
+        path => <<"/api/users">>,
+        headers => #{}
+    },
     {ok, Req} = my_first_nova_metrics_plugin:pre_request(Req, #{}),
     %% cast sends a message to pid — verify it was sent
     receive
@@ -17,9 +21,13 @@ pre_request_sets_method_and_path_test() ->
     end.
 
 pre_request_includes_tag_when_configured_test() ->
-    Req = #{pid => self(), streamid => 1,
-            method => <<"POST">>, path => <<"/api/products">>,
-            headers => #{}},
+    Req = #{
+        pid => self(),
+        streamid => 1,
+        method => <<"POST">>,
+        path => <<"/api/products">>,
+        headers => #{}
+    },
     {ok, Req} = my_first_nova_metrics_plugin:pre_request(Req, #{tag => <<"api">>}),
     receive
         {{_, 1}, {set_options, #{metrics_user_data := UserData}}} ->

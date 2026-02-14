@@ -549,23 +549,23 @@ No PostgreSQL `CREATE TYPE` is needed — the column is a plain `VARCHAR(255)`. 
 
 ### Query telemetry
 
-Add a `log` callback to your repo config to receive timing data for every query:
+Enable query logging via `sys.config` under the `kura` application key:
 
 ```erlang
-config() ->
-    #{
-        pool => ?MODULE,
-        database => <<"my_first_nova_dev">>,
-        log => fun(Event) ->
-            logger:info("~s (~pus)", [
-                maps:get(query, Event),
-                maps:get(duration_us, Event)
-            ])
-        end
-    }.
+{kura, [
+    {log, true}
+]}.
 ```
 
-The event map contains:
+This uses the built-in default logger (`logger:info`). You can also point to a custom handler:
+
+```erlang
+{kura, [
+    {log, {my_first_nova_telemetry, handle_query}}
+]}.
+```
+
+Each query emits an event map:
 
 ```erlang
 #{query => <<"SELECT ...">>,
@@ -576,7 +576,7 @@ The event map contains:
   repo => my_first_nova_repo}
 ```
 
-Use this for slow query logging, metrics collection, or debugging during development. If no `log` key is set, there is no overhead.
+Use this for slow query logging, metrics collection, or debugging during development. If `log` is absent or `false`, there is no overhead.
 
 ### Nested changesets
 

@@ -9,7 +9,7 @@
         kernel,
         stdlib,
         nova,
-        pgo
+        kura
     ]},
     {env, []},
     {modules, []},
